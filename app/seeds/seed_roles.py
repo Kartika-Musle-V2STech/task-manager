@@ -1,5 +1,6 @@
-from app.models.role import Role
+from app.core.models import Role
 from app.seeds.base import get_or_create
+
 
 def seed_roles(db):
     """

@@ -1,3 +1,7 @@
+"""
+Script to run all database seeder functions.
+"""
+
 from app.core.database import SessionLocal
 from app.seeds.seed_roles import seed_roles
 from app.seeds.seed_task_desc import seed_task_data
@@ -5,6 +9,7 @@ from app.seeds.seed_project_templates import seed_project_templated
 
 
 def run_seeds():
+    """Orchestrates the execution of all database seeder functions."""
     db = SessionLocal()
     try:
         seed_roles(db)
@@ -12,6 +17,7 @@ def run_seeds():
         seed_project_templated(db)
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     run_seeds()

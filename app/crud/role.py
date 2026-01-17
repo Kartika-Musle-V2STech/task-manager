@@ -1,5 +1,10 @@
+"""
+CRUD operations for Role model.
+"""
+
 from sqlalchemy.orm import Session
-from app.models.role import Role
+from app.core.models import Role
+
 
 def get_all_roles(db: Session):
     """
@@ -7,5 +12,3 @@ def get_all_roles(db: Session):
     Used for dropdowns and read-only listings.
     """
     return db.query(Role).order_by(Role.id).all()
-    
-

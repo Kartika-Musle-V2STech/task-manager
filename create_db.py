@@ -1,13 +1,7 @@
-from app.core.database import engine, Base
+"""Script to initialize the database and create tables."""
 
-# Import ALL models that define tables
-from app.models.user import User
-from app.models.role import Role
-from app.models.project_template import ProjectTemplate
-from app.models.project import Project
-from app.models.project_member import ProjectMember
-from app.models.task_type import TaskType
-from app.models.task import Task
+from app.db_init import init_db
 
-Base.metadata.create_all(bind=engine)
-print("All tables created successfully")
+if __name__ == "__main__":
+    init_db()
+    print("All tables created successfully")

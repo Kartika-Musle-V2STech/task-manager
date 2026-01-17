@@ -1,6 +1,7 @@
-from app.models.user import User
-from app.models.role import Role
+from app.core.models import User
+from app.core.models import Role
 from app.seeds.base import get_or_create
+
 
 def seed_system_users(db):
     """
@@ -11,23 +12,24 @@ def seed_system_users(db):
         raise RuntimeError("Roles must be seeded before users")
 
     users = [
-    {
-        "email": "system@app.local",
-        "name": "System",
-    },
-    {
-        "email": "admin@app.local",
-        "name": "Admin Bot",
-    },
-]
-for u in users:
-    get_or_create(
-        db,
-        User, 
-        email=u["email"],
-        default={
-            "name":u["name"],
-            "password_hash" : "SYSTEM_USER",
-            "role_id": default_role.id,
+        {
+            "email": "system@app.local",
+            "name": "System",
         },
-    )
+        {
+            "email": "admin@app.local",
+            "name": "Admin Bot",
+        },
+    ]
+
+    for u in users:
+        get_or_create(
+            db,
+            User,
+            email=u["email"],
+            default={
+                "name": u["name"],
+                "password_hash": "SYSTEM_USER",
+                "role_id": default_role.id,
+            },
+        )

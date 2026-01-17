@@ -6,6 +6,7 @@ from app.seeds.seed_project_templates import seed_project_templated
 
 
 def run_seeds():
+    """Run all seed functions to populate the database."""
     db = SessionLocal()
     try:
         seed_roles(db)

@@ -1,4 +1,4 @@
-from app.models.task_type import TaskType
+from app.core.models import TaskType
 from app.seeds.base import get_or_create
 
 

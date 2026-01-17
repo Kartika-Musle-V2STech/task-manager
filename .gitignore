@@ -1,25 +1,50 @@
-# Environment variables
-.env
-.env.*
-
-# Databases
-*.db
-*.sqlite3
-
 # Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 *.pyc
-
-# Virtual environments
+*.pyo
+*.pyd
 .venv/
 venv/
+ENV/
+env/
 
-# OS / IDE junk
-.DS_Store
-.idea/
+# Environment variables (IMPORTANT - Never commit secrets!)
+.env
+.env.local
+.env.*.local
+
+# Database files (Don't commit local database)
+*.db
+*.sqlite
+*.sqlite3
+taskdb.db
+
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Accidental junk
--d
--e
--p
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Docker (keep Dockerfile, exclude running containers)
+.dockerignore
+
+# Alembic (keep migrations, exclude byte-compiled)
+alembic/versions/__pycache__/

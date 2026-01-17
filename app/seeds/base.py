@@ -1,7 +1,12 @@
+"""
+Base seeding utilities.
+"""
+
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-def get_or_create(db:Session, model, defaults=None, **filters):
+
+def get_or_create(db: Session, model, defaults=None, **filters):
     """
     get an existing row matchin filters or create it.
     """
@@ -16,11 +21,11 @@ def get_or_create(db:Session, model, defaults=None, **filters):
     instance = model(**params)
     db.add(instance)
 
-    try: 
-       db.commit()
+    try:
+        db.commit()
     except IntegrityError:
         db.rollback()
         return db.query(model).filter_by(**filters).first()
-        
+
     db.refresh(instance)
     return instance

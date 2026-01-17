@@ -1,11 +1,30 @@
-from pydantic_settings import BaseSettings
-from dotenv import load_dotenv  
+"""
+Configuration settings for the application.
+"""
 
-load_dotenv()
+from pydantic import Field
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
-    SECRET_KEY: str | None = None
-    ALGORITHM: str | None = None
-    ACCESS_TOKEN_EXPIRE_MINUTES: int | None = None
+    """
+    Application settings configuration.
+    """
+
+    # App
+    APP_NAME: str = Field(default="Task Manager API")
+    DEBUG: bool = Field(default=False)
+
+    # Database
+    DATABASE_URL: str = Field(..., description="Database connection string")
+
+    class Config:
+        """
+        Pydantic configuration.
+        """
+
+        env_file = ".env"
+        extra = "ignore"
+
 
 settings = Settings()

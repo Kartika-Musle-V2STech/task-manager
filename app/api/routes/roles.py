@@ -1,14 +1,25 @@
+"""
+API routes for Role management.
+"""
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
 from app.api.deps import get_db
 from app.crud.role import get_all_roles
 from app.schemas.role import RoleOut
 
 router = APIRouter(
     prefix="/roles",
-    tags=["Roles"]
+    tags=["Roles"],
 )
 
-@router.get("/", response_model=list[RoleOut])
+
+@router.get(
+    "/",
+    response_model=list[RoleOut],
+    summary="List roles",
+)
 def list_roles(db: Session = Depends(get_db)):
+    """Retrieve all available roles"""
     return get_all_roles(db)

@@ -1,5 +1,6 @@
 from app.core.database import engine, Base
-import app.models  # IMPORTANT: ensures all models are registered
+import app.core.models  
 
 def init_db():
+    """Initialize the database by creating all tables."""
     Base.metadata.create_all(bind=engine)
