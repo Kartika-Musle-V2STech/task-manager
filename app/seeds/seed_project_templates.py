@@ -3,16 +3,13 @@
 This module contains functions to populate the database with initial project templates.
 """
 
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.models import ProjectTemplate
 from app.seeds.base import get_or_create
 
 
-def seed_project_templated(db):
-    """Seed project templates into the database.
-
-    Args:
-        db: The database session to use for seeding.
-    """
+async def seed_project_templated(db: AsyncSession):
+    """Seed project templates into the database."""
     templates = [
         {
             "name": "Website Chatbot Integration",
@@ -29,7 +26,7 @@ def seed_project_templated(db):
     ]
 
     for tpl in templates:
-        get_or_create(
+        await get_or_create(
             db,
             ProjectTemplate,
             name=tpl["name"],

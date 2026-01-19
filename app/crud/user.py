@@ -1,8 +1,9 @@
 """
-User CRUD operations.
+User CRUD operations (Async).
 """
 
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from app.core.models import User
@@ -11,8 +12,15 @@ from app.core.security import hash_password
 from app.schemas.user import UserCreate
 
 
-def create_user(db: Session, user_in: UserCreate) -> User:
+# USER CRUD
+
+
+async def create_user(
+    db: AsyncSession,
+    user_in: UserCreate,
+) -> User:
     """Create a new user and hash the password"""
+
     hashed_pw = hash_password(user_in.password)
 
     user = User(
@@ -25,31 +33,47 @@ def create_user(db: Session, user_in: UserCreate) -> User:
     db.add(user)
 
     try:
-        db.commit()
-    except IntegrityError:
-        db.rollback()
-        raise BadRequestException("User with this email already exists")
+        await db.commit()
+    except IntegrityError as exc:
+        await db.rollback()
+        raise BadRequestException("User with this email already exists") from exc
 
-    db.refresh(user)
+    await db.refresh(user)
     return user
 
 
-def get_all_users(db: Session) -> list[User]:
+async def get_all_users(db: AsyncSession) -> list[User]:
     """Retrieve all users ordered by ID"""
-    return db.query(User).order_by(User.id).all()
+
+    result = await db.execute(select(User).order_by(User.id))
+    return result.scalars().all()
 
 
-def get_user_by_id(db: Session, user_id: int) -> User:
+async def get_user_by_id(
+    db: AsyncSession,
+    user_id: int,
+) -> User:
     """Retrieve a single user by ID"""
-    user = db.query(User).filter(User.id == user_id).first()
+
+    result = await db.execute(select(User).filter(User.id == user_id))
+    user = result.scalars().first()
+
     if not user:
         raise NotFoundException("User not found")
+
     return user
 
 
-def get_user_by_email(db: Session, email: str) -> User:
+async def get_user_by_email(
+    db: AsyncSession,
+    email: str,
+) -> User:
     """Retrieve a single user by email"""
-    user = db.query(User).filter(User.email == email).first()
+
+    result = await db.execute(select(User).filter(User.email == email))
+    user = result.scalars().first()
+
     if not user:
         raise NotFoundException("User not found")
+
     return user

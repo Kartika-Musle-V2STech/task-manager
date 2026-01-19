@@ -1,13 +1,20 @@
-from app.core.models import User
-from app.core.models import Role
+"""Seed data for users."""
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+from app.core.models import User, Role
 from app.seeds.base import get_or_create
 
 
-def seed_system_users(db):
+async def seed_system_users(db: AsyncSession):
     """
     Seed system/demo users used for project creation and history tracking
     """
-    default_role = db.query(Role).first()
+
+    result = await db.execute(select(Role).order_by(Role.id))
+    default_role = result.scalar_one_or_none()
+
     if not default_role:
         raise RuntimeError("Roles must be seeded before users")
 
@@ -23,11 +30,11 @@ def seed_system_users(db):
     ]
 
     for u in users:
-        get_or_create(
+        await get_or_create(
             db,
             User,
             email=u["email"],
-            default={
+            defaults={
                 "name": u["name"],
                 "password_hash": "SYSTEM_USER",
                 "role_id": default_role.id,

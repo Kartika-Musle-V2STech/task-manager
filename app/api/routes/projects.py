@@ -6,7 +6,7 @@ API routes for Project Setup:
 """
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
 from app.crud.project import (
@@ -37,9 +37,11 @@ router = APIRouter(
     response_model=list[ProjectOut],
     summary="List projects",
 )
-def list_projects(db: Session = Depends(get_db)):
+async def list_projects(
+    db: AsyncSession = Depends(get_db),
+):
     """Retrieve a list of all projects"""
-    return get_all_projects(db)
+    return await get_all_projects(db)
 
 
 @router.post(
@@ -47,12 +49,12 @@ def list_projects(db: Session = Depends(get_db)):
     response_model=ProjectOut,
     summary="Create project",
 )
-def create_new_project(
+async def create_new_project(
     project_in: ProjectCreate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     """Create a new project"""
-    return create_project(db, project_in)
+    return await create_project(db, project_in)
 
 
 # PROJECT TEMPLATES
@@ -63,9 +65,11 @@ def create_new_project(
     response_model=list[ProjectTemplateOut],
     summary="List project templates",
 )
-def list_project_templates(db: Session = Depends(get_db)):
+async def list_project_templates(
+    db: AsyncSession = Depends(get_db),
+):
     """Retrieve all project templates"""
-    return get_all_project_templates(db)
+    return await get_all_project_templates(db)
 
 
 # PROJECT MEMBERS
@@ -76,12 +80,12 @@ def list_project_templates(db: Session = Depends(get_db)):
     response_model=ProjectMemberOut,
     summary="Add project member",
 )
-def add_member(
+async def add_member(
     member_in: ProjectMemberCreate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     """Assign a user to a project with a specific role"""
-    return add_project_member(db, member_in)
+    return await add_project_member(db, member_in)
 
 
 @router.get(
@@ -89,9 +93,9 @@ def add_member(
     response_model=list[ProjectMemberOut],
     summary="List project members",
 )
-def list_project_members(
+async def list_project_members(
     project_id: int,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     """Retrieve all members assigned to a project"""
-    return get_project_members(db, project_id)
+    return await get_project_members(db, project_id)

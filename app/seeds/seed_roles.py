@@ -1,8 +1,13 @@
+"""
+Module for seeding role data into the database.
+"""
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.models import Role
 from app.seeds.base import get_or_create
 
 
-def seed_roles(db):
+async def seed_roles(db: AsyncSession):
     """
     Seed for job roles. Used for user profile and project/task context
     """
@@ -18,5 +23,6 @@ def seed_roles(db):
         "Mobile Engineer",
         "QA Engineer",
     ]
+
     for role in roles:
-        get_or_create(db, Role, name=role)
+        await get_or_create(db, Role, name=role)

@@ -1,16 +1,17 @@
 """
-Base seeding utilities.
+Base seeding utilities (Async).
 """
 
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 
-def get_or_create(db: Session, model, defaults=None, **filters):
-    """
-    get an existing row matchin filters or create it.
-    """
-    instance = db.query(model).filter_by(**filters).first()
+async def get_or_create(db: AsyncSession, model, defaults=None, **filters):
+    stmt = select(model).filter_by(**filters)
+    result = await db.execute(stmt)
+    instance = result.scalars().first()
+
     if instance:
         return instance
 
@@ -22,10 +23,11 @@ def get_or_create(db: Session, model, defaults=None, **filters):
     db.add(instance)
 
     try:
-        db.commit()
+        await db.commit()
     except IntegrityError:
-        db.rollback()
-        return db.query(model).filter_by(**filters).first()
+        await db.rollback()
+        result = await db.execute(stmt)
+        return result.scalars().first()
 
-    db.refresh(instance)
+    await db.refresh(instance)
     return instance

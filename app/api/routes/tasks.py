@@ -3,7 +3,7 @@ API routes for Tasks and Task Types
 """
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
 from app.schemas.task import (
@@ -33,9 +33,9 @@ router = APIRouter(
     response_model=list[TaskOut],
     summary="List tasks",
 )
-def list_tasks(db: Session = Depends(get_db)):
+async def list_tasks(db: AsyncSession = Depends(get_db)):
     """Retrieve all tasks"""
-    return get_all_tasks(db)
+    return await get_all_tasks(db)
 
 
 @router.post(
@@ -43,12 +43,12 @@ def list_tasks(db: Session = Depends(get_db)):
     response_model=TaskOut,
     summary="Create task",
 )
-def create_task_api(
+async def create_task_api(
     payload: TaskCreate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     """Create a new task"""
-    return create_task(db, payload)
+    return await create_task(db, payload)
 
 
 @router.patch(
@@ -56,13 +56,13 @@ def create_task_api(
     response_model=TaskOut,
     summary="Update task status",
 )
-def update_task_status_api(
+async def update_task_status_api(
     task_id: int,
     payload: TaskStatusUpdate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     """Update the status of an existing task"""
-    return update_task_status(db, task_id, payload.status)
+    return await update_task_status(db, task_id, payload.status)
 
 
 # TASK TYPES
@@ -73,6 +73,6 @@ def update_task_status_api(
     response_model=list[TaskTypeOut],
     summary="List task types",
 )
-def list_task_types(db: Session = Depends(get_db)):
+async def list_task_types(db: AsyncSession = Depends(get_db)):
     """Retrieve all task types"""
-    return get_all_task_types(db)
+    return await get_all_task_types(db)

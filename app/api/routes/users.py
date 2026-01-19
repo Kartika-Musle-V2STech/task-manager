@@ -2,12 +2,12 @@
 API routes for User operations.
 """
 
-from fastapi import APIRouter, Depends, status  # 🔁 CHANGED
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
 from app.crud.user import create_user, get_all_users
-from app.schemas.user import UserCreate, UserOut  
+from app.schemas.user import UserCreate, UserOut
 
 router = APIRouter(
     prefix="/users",
@@ -20,9 +20,9 @@ router = APIRouter(
     response_model=list[UserOut],
     summary="List users",
 )
-def list_users(db: Session = Depends(get_db)):
+async def list_users(db: AsyncSession = Depends(get_db)):
     """Retrieve all users"""
-    return get_all_users(db)
+    return await get_all_users(db)
 
 
 @router.post(
@@ -31,9 +31,9 @@ def list_users(db: Session = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
     summary="Create user",
 )
-def create_new_user(
+async def create_new_user(
     user_in: UserCreate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     """Create a new user"""
-    return create_user(db, user_in)  
+    return await create_user(db, user_in)

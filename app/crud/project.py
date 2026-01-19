@@ -1,8 +1,10 @@
 """
-CRUD operations for Projects, Project Templates, and Project Members.
+CRUD operations for Projects, Project Templates, and Project Members (Async).
 """
 
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
 from app.core.models import Project, ProjectTemplate, ProjectMember
@@ -13,11 +15,15 @@ from app.schemas.project import ProjectCreate, ProjectMemberCreate
 # PROJECT CRUD
 
 
-def create_project(db: Session, project_in: ProjectCreate) -> Project:
+async def create_project(
+    db: AsyncSession,
+    project_in: ProjectCreate,
+) -> Project:
     """
     Create a new project.
     Project is created from a project template and associated with a creator user.
     """
+
     project = Project(
         project_template_id=project_in.project_template_id,
         start_date=project_in.start_date,
@@ -28,50 +34,62 @@ def create_project(db: Session, project_in: ProjectCreate) -> Project:
     db.add(project)
 
     try:
-        db.commit()
+        await db.commit()
     except IntegrityError as exc:
-        db.rollback()
+        await db.rollback()
         raise BadRequestException("Invalid Project or Duplicate Project") from exc
 
-    db.refresh(project)
+    await db.refresh(project)
 
-    return (
-        db.query(Project)
+    result = await db.execute(
+        select(Project)
         .options(
-            joinedload(Project.created_by),
-            joinedload(Project.project_template),
+            selectinload(Project.created_by),  # Changed from joinedload
+            selectinload(Project.project_template),  # Changed from joinedload
         )
-        .filter(Project.id == project.id)
-        .first()
+        .where(Project.id == project.id)
     )
 
+    return result.scalar_one()
 
-def get_all_projects(db: Session) -> list[Project]:
+
+async def get_all_projects(db: AsyncSession) -> list[Project]:
     """Retrieve all projects"""
-    return (
-        db.query(Project)
+
+    result = await db.execute(
+        select(Project)
         .options(
-            joinedload(Project.created_by),
-            joinedload(Project.project_template),
+            selectinload(Project.created_by),
+            selectinload(Project.project_template),
         )
         .order_by(Project.id)
-        .all()
     )
+
+    return result.scalars().all()
 
 
 # PROJECT TEMPLATE CRUD
 
 
-def get_all_project_templates(db: Session) -> list[ProjectTemplate]:
+async def get_all_project_templates(
+    db: AsyncSession,
+) -> list[ProjectTemplate]:
     """Return all project templates"""
-    return db.query(ProjectTemplate).order_by(ProjectTemplate.id).all()
+
+    result = await db.execute(select(ProjectTemplate).order_by(ProjectTemplate.id))
+
+    return result.scalars().all()
 
 
 # PROJECT MEMBER CRUD
 
 
-def add_project_member(db: Session, member_in: ProjectMemberCreate) -> ProjectMember:
+async def add_project_member(
+    db: AsyncSession,
+    member_in: ProjectMemberCreate,
+) -> ProjectMember:
     """Add a user to a project with a role"""
+
     member = ProjectMember(
         user_id=member_in.user_id,
         project_id=member_in.project_id,
@@ -81,39 +99,45 @@ def add_project_member(db: Session, member_in: ProjectMemberCreate) -> ProjectMe
     db.add(member)
 
     try:
-        db.commit()
+        await db.commit()
     except IntegrityError as exc:
-        db.rollback()
+        await db.rollback()
         raise BadRequestException(
             "User already assigned to this project or invalid IDs"
         ) from exc
 
-    db.refresh(member)
+    await db.refresh(member)
 
-    return (
-        db.query(ProjectMember)
+    result = await db.execute(
+        select(ProjectMember)
         .options(
-            joinedload(ProjectMember.user),
-            joinedload(ProjectMember.project),
-            joinedload(ProjectMember.role),
+            selectinload(ProjectMember.user),
+            selectinload(ProjectMember.project),
+            selectinload(ProjectMember.role),
         )
-        .filter(ProjectMember.id == member.id)
-        .first()
+        .where(ProjectMember.id == member.id)
     )
 
+    return result.scalar_one()
 
-def get_project_members(db: Session, project_id: int) -> list[ProjectMember]:
+
+async def get_project_members(
+    db: AsyncSession,
+    project_id: int,
+) -> list[ProjectMember]:
     """Retrieve all members of a project"""
-    members = (
-        db.query(ProjectMember)
+
+    result = await db.execute(
+        select(ProjectMember)
         .options(
-            joinedload(ProjectMember.user),
-            joinedload(ProjectMember.project),
-            joinedload(ProjectMember.role),
+            selectinload(ProjectMember.user),
+            selectinload(ProjectMember.project),
+            selectinload(ProjectMember.role),
         )
-        .filter(ProjectMember.project_id == project_id)
-        .all()
+        .where(ProjectMember.project_id == project_id)
     )
+
+    members = result.scalars().all()
 
     if not members:
         raise NotFoundException("No members found for this project")

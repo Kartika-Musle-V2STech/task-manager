@@ -10,8 +10,6 @@ class Settings(BaseSettings):
     """
     Application settings configuration.
     """
-
-    # App
     APP_NAME: str = Field(default="Task Manager API")
     DEBUG: bool = Field(default=False)
 
