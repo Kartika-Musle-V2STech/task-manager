@@ -1,15 +1,25 @@
-from pydantic import BaseModel, ConfigDict
+"""
+Module for Role Pydantic schemas.
+"""
+
+from pydantic import Field, BaseModel, ConfigDict
+
 
 class RoleBase(BaseModel):
     """Base schema containing fields common to all role-related schemas"""
-    name: str
+
+    name: str = Field(..., min_length=2, max_length=50)
+
 
 class RoleCreate(RoleBase):
     """Schema used when creating a new role"""
+
     pass
+
 
 class RoleOut(RoleBase):
     """Schema returned in API responses when a role is fetched or listed"""
+
     id: int
 
     model_config = ConfigDict(from_attributes=True)

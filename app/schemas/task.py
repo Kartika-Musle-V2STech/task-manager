@@ -2,7 +2,7 @@
 Module for Task Pydantic schemas.
 """
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import Field, BaseModel, ConfigDict
 from app.core.models import TaskStatusEnum, TaskPriorityEnum
 
 # TASK SCHEMAS
@@ -11,9 +11,9 @@ from app.core.models import TaskStatusEnum, TaskPriorityEnum
 class TaskBase(BaseModel):
     """Fields common to task creation and output"""
 
-    title: str
-    project_id: int
-    type_id: int
+    title: str = Field(..., min_length=3, max_length=50)
+    project_id: int = Field(..., gt=0)
+    type_id: int = Field(..., gt=0)
     priority: TaskPriorityEnum
 
 

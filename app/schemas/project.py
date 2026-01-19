@@ -3,7 +3,7 @@ Schemas for Project, Project Template, and Project Member operations.
 """
 
 from datetime import date
-from pydantic import BaseModel, ConfigDict
+from pydantic import Field, EmailStr, BaseModel, ConfigDict
 
 # SHARED / BASIC SCHEMAS
 
@@ -54,10 +54,10 @@ class ProjectTemplateBasicInfo(BaseModel):
 class ProjectCreate(BaseModel):
     """Schema used when creating a new project"""
 
-    project_template_id: int
-    start_date: date
-    end_date: date | None = None
-    created_by_id: int
+    project_template_id: int = Field(..., gt=0)
+    start_date: date = Field(..., description="Project Start Date")
+    end_date: date | None = Field(None, description="Project End Date")
+    created_by_id: int = Field(..., gt=0)
 
 
 class ProjectOut(BaseModel):
@@ -80,8 +80,8 @@ class ProjectOut(BaseModel):
 class ProjectTemplateBase(BaseModel):
     """Base schema for project templates"""
 
-    name: str
-    description: str | None = None
+    name: str = Field(..., min_length=2, max_length=50)
+    description: str | None = Field(None, max_length=500)
 
 
 class ProjectTemplateCreate(ProjectTemplateBase):
@@ -102,9 +102,9 @@ class ProjectTemplateOut(ProjectTemplateBase):
 class ProjectMemberCreate(BaseModel):
     """Schema used when assigning a user to a project"""
 
-    user_id: int
-    project_id: int
-    role_id: int
+    user_id: int = Field(..., gt=0)
+    project_id: int = Field(..., gt=0)
+    role_id: int = Field(..., gt=0)
 
 
 class ProjectMemberOut(BaseModel):
