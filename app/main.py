@@ -10,6 +10,9 @@ from app.api.routes import (
     projects_router,
     tasks_router,
 )
+from app.core.exception_handlers import domain_exception_handler
+from app.core.exceptions import DomainException
+
 
 from app.core.lifespan import lifespan
 from app.core.exceptions import BadRequestException, NotFoundException
@@ -55,6 +58,7 @@ app.add_middleware(
 
 app.add_exception_handler(BadRequestException, bad_request_handler)
 app.add_exception_handler(NotFoundException, not_found_handler)
+app.add_exception_handler(DomainException, domain_exception_handler)
 
 # Include routers
 app.include_router(users_router)

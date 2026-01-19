@@ -11,6 +11,11 @@ from app.core.models import Base
 
 @asynccontextmanager
 async def lifespan(app):
+    """
+    Context manager handling the lifespan of the FastAPI application.
+
+    This function handles startup and shutdown events, including database table creation.
+    """
     print("Application starting")
 
     async with engine.begin() as conn:

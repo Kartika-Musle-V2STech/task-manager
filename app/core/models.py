@@ -1,6 +1,10 @@
-from sqlalchemy import null
+"""
+Database models for the application.
+"""
+
 from enum import Enum as PyEnum
 from datetime import date
+from sqlalchemy import null
 
 from sqlalchemy import (
     Column,
@@ -28,6 +32,7 @@ class TaskStatusEnum(str, PyEnum):
 
     @classmethod
     def values(cls) -> list[str]:
+        """Returns a list of all values in the enum."""
         return [e.value for e in cls]
 
 
@@ -46,7 +51,6 @@ class TaskPriorityEnum(str, PyEnum):
 
 # Role
 
-
 class Role(Base):
     """Represents a role. Used for users and project members"""
 
@@ -64,7 +68,6 @@ class Role(Base):
 
 
 # User
-
 
 class User(Base):
     """Represents a user"""
